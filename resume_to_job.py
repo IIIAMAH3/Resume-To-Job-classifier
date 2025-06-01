@@ -6,12 +6,27 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score
 import re
+import time
+from functools import wraps
+
 
 nlp = spacy.load("en_core_web_md", disable=["parser", "ner", "lemmatizer"])
 
 nlp.enable_pipe("lemmatizer")
 
+def timing_decorator(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        start_time = time.perf_counter()  # high-precision timer
+        result = func(*args, **kwargs)
+        end_time = time.perf_counter()
+        duration = end_time - start_time
+        print(f"Function '{func.__name__}' took {duration:.4f} seconds to run.")
+        return result
+    return wrapper
 
+
+@timing_decorator
 def preprocess_text(text):
     # Remove special characters/numbers
     text = re.sub(r"[^a-zA-Z\s]", "", text)
@@ -35,7 +50,7 @@ df2 = df2.rename(columns={"Resume": "Resume_str"})
 df2["Resume_str"] = df2["Resume_str"].str.encode("latin1").str.decode("utf-8")
 
 main_df = pd.concat([df1, df2], ignore_index=True)
-
+# Store it in a pickle file
 # main_df["Resume_str"] = main_df["Resume_str"].apply(preprocess_text)
 print(4)
 # Separate features and targets
