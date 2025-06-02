@@ -4,12 +4,13 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.svm import SVC
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, confusion_matrix, ConfusionMatrixDisplay, classification_report
 import time
 from functools import wraps
 import os
 import pickle
-
+import matplotlib.pyplot as plt
+import seaborn as sns
 nlp = spacy.load("en_core_web_md", disable=["parser", "ner", "lemmatizer"])
 
 nlp.enable_pipe("lemmatizer")
@@ -50,14 +51,27 @@ y = main_df["Category"]
 # Split the dataset into train/test subsets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 
-# Standardize features
-scaler = StandardScaler(with_mean=False)
-X_train_scaled = scaler.fit_transform(X_train)
-X_test_scaled = scaler.transform(X_test)
-
 # Train a classifier
 clf = SVC(kernel="linear")
 clf.fit(X_train, y_train)
 
 y_pred = clf.predict(X_test)
 print(f"Accuracy: {accuracy_score(y_test, y_pred):.2f}")
+
+report = classification_report(y_test, y_pred, output_dict=True, zero_division=0)
+
+fig_height = max(12, len(report) * 0.4)
+plt.figure(figsize=(10, fig_height))
+sns.heatmap(pd.DataFrame(report).iloc[:-1, :].T,
+            annot=True,
+            cmap="Blues",
+            fmt=".2f",
+            cbar=True,
+            linewidths=0.5,
+            annot_kws={"size": 11})
+
+plt.title("Classification Report", fontsize=16)
+plt.xticks(rotation=45, fontsize=12)
+plt.yticks(rotation=0, fontsize=10)
+plt.tight_layout()
+plt.show()
