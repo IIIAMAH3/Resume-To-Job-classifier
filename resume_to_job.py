@@ -1,16 +1,16 @@
 import pandas as pd
 import spacy
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.svm import SVC
-from sklearn.metrics import accuracy_score, confusion_matrix, ConfusionMatrixDisplay, classification_report
+from sklearn.metrics import accuracy_score, classification_report
 import time
 from functools import wraps
 import os
 import pickle
 import matplotlib.pyplot as plt
 import seaborn as sns
+
 nlp = spacy.load("en_core_web_md", disable=["parser", "ner", "lemmatizer"])
 
 nlp.enable_pipe("lemmatizer")
