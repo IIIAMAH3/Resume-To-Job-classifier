@@ -33,12 +33,15 @@ if os.path.exists("preprocessed_resumes.pkl"):
 else:
     df1 = pd.read_csv("Resume.csv")[["Resume_str", "Category"]]
 
-    df2 = pd.read_csv("UpdatedResumeDataSet.csv")[["Resume", "Category"]]
-    df2 = df2.rename(columns={"Resume": "Resume_str"})
+    df2 = pd.read_csv("UpdatedResumeDataSet.csv")[["Resume_str", "Category"]]
 
     main_df = pd.concat([df1, df2], ignore_index=True)
 
     main_df["Resume_str"] = main_df["Resume_str"].apply(lambda x: x.lower().strip())
+    main_df["Category"] = main_df["Category"].apply(lambda x: x.lower().strip())
+    categories_to_drop = ["advocate", "agriculture", "apparel", "automobile", "bpo", "consultant", "arts", "aviation",
+                          "banking", "business-development", "healthcare"]
+    main_df = main_df[~main_df["Category"].isin(categories_to_drop)]
 
     with open("preprocessed_resumes.pkl", "wb") as f:
         pickle.dump(main_df, f)
